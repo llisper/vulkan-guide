@@ -19,6 +19,7 @@ struct FrameData
 	VkFence _renderFence;
 	
 	DeletionQueue _deletionQueue;
+	DescriptorAllocatorGrowable _frameDescriptors;
 };
 
 constexpr uint32_t FRAME_OVERLAP = 2;
@@ -73,6 +74,9 @@ public:
 	VkDescriptorSet _drawImageDescriptors{ nullptr };
 	VkDescriptorSetLayout _drawImageDescriptorLayout{ nullptr };
 	
+	GPUSceneData sceneData;
+	VkDescriptorSetLayout _gpuSceneDataDescriptorLayout{ nullptr };
+	
 public:
 	VkPipeline _gradientPipeline{ nullptr };
 	VkPipelineLayout _gradientPipelineLayout{ nullptr };
@@ -96,6 +100,20 @@ public:
 	void init_default_data();
 	
 	GPUMeshBuffers upload_mesh(std::span<uint32_t> indices, std::span<Vertex> vertices);
+	
+public:
+	AllocatedImage create_image(VkExtent3D size, VkFormat format, VkImageUsageFlags usageFlags, bool mipmapped=false);
+	AllocatedImage create_image(void* data, VkExtent3D size, VkFormat format, VkImageUsageFlags usageFlags, bool mipmapped=false);
+	void destroy_image(const AllocatedImage& image);
+	
+	AllocatedImage _whiteImage;
+	AllocatedImage _blackImage;
+	AllocatedImage _greyImage;
+	AllocatedImage _errorCheckerboardImage;
+	
+	VkSampler _defaultSamplerLinear;
+	VkSampler _defaultSamplerNearest;
+	
 public:
 	VkFence _immFence{ nullptr };
 	VkCommandBuffer _immCommandBuffer{ nullptr };
